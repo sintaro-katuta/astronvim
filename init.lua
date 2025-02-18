@@ -16,7 +16,6 @@ if not pcall(require, "lazy") then
 end
 
 require "lazy_setup"
-require "polish"
 require "base"
 require "mappings"
 require "colorschema"

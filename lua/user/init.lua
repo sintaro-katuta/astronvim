@@ -9,7 +9,6 @@ return {
     vim.api.nvim_create_autocmd("User", {
       pattern = "LazyVimStarted",
       callback = function()
-        require("lualine").setup()
       end,
     })
   end,

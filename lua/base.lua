@@ -1,150 +1,218 @@
--- Normal mode mappings (non-recursive)
--- 
-local keymap = vim.api.nvim_set_keymap
-keymap('n', 'x', '"_x', { noremap = true })
-keymap('n', 's', '"_s', { noremap = true })
-keymap('n', 'f', '<leader><leader><leader>bdw', { noremap = true })
+-- 色コードをまとめて設定。各プラグインの色設定で使用
+local colors = {
+  fg = '#ffffff',
+  fg2 = '#353535',
+  fg3 = '#a8a8a8',
+  bg = '#525252',
+  bg3 = '#353535',
+  white = '#ffffff',
+  black = '#000000',
+  yellow = '#ffec50',
+  orange = '#ffaf00',
+  red = '#ff6510',
+  magenta = '#e0898d',
+  cyan = '#7bbfff',
+  blue = '#235bc8',
+  darkblue = '#3672a4',
+  green = '#78ff94',
+  darkbrown = '#542d24',
+}
 
--- Normal mode mappings
-keymap('n', 'J', '10j', { noremap = true })
-keymap('n', 'K', '10k', { noremap = true })
-keymap('n', 'H', '^', { noremap = true })
-keymap('n', 'L', '$', { noremap = true })
+-- 独自テーマの設定
+local custom_theme = {
+  normal = {
+    a = { fg = colors.fg2, bg = colors.cyan, gui = 'bold' },
+    b = { fg = colors.fg, bg = colors.darkblue },
+    c = { fg = colors.fg, bg = colors.bg },
+  },
+  insert = { a = { fg = colors.fg2, bg = colors.yellow, gui = 'bold' } },
+  visual = { a = { fg = colors.fg2, bg = colors.magenta, gui = 'bold' } },
+  replace = { a = { fg = colors.fg2, bg = colors.green, gui = 'bold' } },
+  command = { a = { fg = colors.fg2, bg = colors.red, gui = 'bold' } },
+  terminal = { a = { fg = colors.fg2, bg = colors.orange, gui = 'bold' } },
+  inactive = {
+    a = { fg = colors.fg, bg = colors.bg3, gui = 'bold' },
+    b = { fg = colors.fg3, bg = colors.bg3 },
+    c = { fg = colors.fg3, bg = colors.bg3 },
+  },
+}
 
-keymap('n', '<Leader>h', '<C-w>h', { noremap = true })
-keymap('n', '<Leader>j', '<C-w>j', { noremap = true })
-keymap('n', '<Leader>k', '<C-w>k', { noremap = true })
-keymap('n', '<Leader>l', '<C-w>l', { noremap = true })
-
-keymap('n', 'u', ':undo<CR>', { noremap = true, silent = true })
-keymap('n', '<C-r>', ':redo<CR>', { noremap = true, silent = true })
-
--- 画面分割
-keymap('n', 'ss', ':split<Return><C-w>w', { noremap = true })
-keymap('n', 'sv', ':vsplit<Return><C-w>w', { noremap = true })
-
-keymap('n', '<C-j>', '<Down>', { noremap = true })
-keymap('n', '<C-k>', '<Up>', { noremap = true })
-
-keymap('n', '<Leader>p', ':lua vim.lsp.buf.formatting()<CR>', { noremap = true, silent = true })
-keymap('n', '<Leader>w', ':w<CR>', { noremap = true, silent = true })
-keymap('n', '<Leader>q', ':q<CR>', { noremap = true, silent = true })
-keymap('n', '<Leader>c', ':Commentary<CR>', { noremap = true, silent = true })
-
-keymap('n', '<Leader>e', ':Neotree filesystem reveal left<CR>', { noremap = true, silent = true}) 
-
-keymap('n', '<C-k>', '<C-w>w', { noremap = true })
--- Insert mode mappings
-keymap('i', 'jj', '<Esc>', { noremap = true })
-
--- Visual mode mappings
-keymap('v', '<Leader>c', ':Commentary<CR>', { noremap = true, silent = true })
-keymap('v', 'H', '^', { noremap = true })
-keymap('v', 'L', '$', { noremap = true })
-
-local function current_time()
-  return os.date("%H:%M")  -- 時:分:秒の形式で現在時刻を取得
-end
-
-local function total_lines()
-  return vim.fn.line('$')
-end
-
-local function encouragement()
-  return [[頑張れ]]
-end
-
-local function lsp_clients()
-  local clients = vim.lsp.get_active_clients({ bufnr = 0 })
-  if next(clients) == nil then return "LSPなし" end
-  local client_names = {}
-  for _, client in pairs(clients) do
-    table.insert(client_names, client.name)
-  end
-  return table.concat(client_names, ", ")
-end
-
-local function indent_style()
-  if vim.bo.expandtab then
-    return vim.bo.shiftwidth .. "スペース"
-  else
-    return vim.bo.tabstop .. "タブ"
+-- fileformatをタイプ別に色分け
+local function fileformat_color()
+  local format = vim.bo.fileformat
+  if format == 'unix' then
+    return { fg = colors.red }
+  elseif format == 'dos' then
+    return { fg = colors.cyan }
+  elseif format == 'mac' then
+    return { fg = colors.green }
   end
 end
 
--- カスタムコンポーネントを作成
-local function yank_register()
-  -- ヤンクレジスタの内容を取得
-  local yank_content = vim.fn.getreg('"')
-
-  -- 改行をスペースに置き換え
-  yank_content = yank_content:gsub("\n", " ")
-
-  -- 内容を10文字に短縮し、長ければ"..."を追加
-  if #yank_content > 10 then
-    yank_content = string.sub(yank_content, 1, 7) .. "..."
-  end
-
-  -- 表示する内容を返す
-  return yank_content ~= "" and yank_content or "EMPTY"
+-- modeの表示文字列を変更
+local function custom_mode()
+  local mode_map = {
+    n = 'N', -- Normal モード
+    i = 'INS', -- Insert モード
+    v = 'VIS', -- Visual モード
+    V = 'V-L', -- Visual-Line モード
+    [''] = 'V-B', -- Visual-Block モード
+    c = 'CMD', -- Command モード
+    R = 'REP', -- Replace モード
+    t = 'TERM', -- Terminal モード
+  }
+  local current_mode = vim.fn.mode()
+  return mode_map[current_mode] or current_mode
 end
 
-require("lualine").setup{
-    options = {
-      icons_enabled = true,
-      theme = 'material',
-      component_separators = { left = '', right = ''},
-      section_separators = { left = '', right = ''},
-      disabled_filetypes = {
-        statusline = {},
-        winbar = {},
+-- 猫ちゃん連れてく
+local function mycat()
+  -- 候補：
+  -- 󰄛 ,󰆚 ,󰩃 ,󰇥 ,󱖿 ,󱗂 ,󰈺 ,󰊠 ,󱕘 ,󱜿 ,󰏩 ,󰻀 ,󰐁 ,󰤇 ,󰚩 ,󱌧 ,󰚌 ,󱙷 ,󰴻 ,󱅼 , ,
+  -- 󰉊 ,󰣠 ,󰋑 ,󱁏 ,󰮣 ,󰟟 ,󰫕 ,󰜃 ,󰮿 ,󰟪 ,󰑣 ,󰚬 ,󱕬 ,󰴺 ,󰓿 ,󰔬 ,󰯙 ,󱂖 ,󰕊 , , ,
+  return '󰄛'
+end
+
+local win_width = vim.api.nvim_win_get_width(0) -- ウィンドウ幅
+
+require('lualine').setup {
+  options = {
+    theme = custom_theme,
+    -- component_separators = { left = '', right = '' },
+    -- component_separators = { left = '|', right = '|' },
+    component_separators = { left = '', right = '' },
+    -- section_separators = { left = '', right = '' },
+    -- section_separators = { left = '', right = '' },
+    section_separators = win_width > 80 and {
+      left = '',
+      right = '',
+    } or {
+        left = '',
+        right = '',
       },
-      ignore_focus = {},
-      always_divide_middle = true,
-      globalstatus = true,
-      refresh = {
-        statusline = 1000,
-        tabline = 1000,
-        winbar = 1000,
-      }
-    },
-    sections = {
-      lualine_a = {'mode'},
-      lualine_b = {{encouragement, color={fg="#FF9999"}},'branch'},
-      lualine_c = {
-        {
-          'diff',
-          symbols = {added = ' ', modified = ' ', removed = ' '},
-        },
-        {
-          'diagnostics',
-          symbols = {error = ' ', warn = ' ', info = ' ', hint = ' '}
-        },
-        {
-          indent_style
-        },
+    globalstatus = false, -- ウィンドウごとに異なるステータスライン
+  },
+  sections = {
+    lualine_a = {
+      {
+        mycat,
+        padding = { left = 1, right = 0 },
+        color = { fg = colors.darkbrown },
+        cond = function()
+          return win_width > 80
+        end,
       },
-      lualine_x = {
-        'encoding', 'filetype', {'filename', path=1}},
-      lualine_y = {
-        {total_lines, color={fg="#FF99FF"}},
-        {yank_register, icon = '📋'},
+      {
+        custom_mode, -- モードをカスタム表示。'mode'の置き換え
       },
-      lualine_z = {
-        {lsp_clients, color={fg="#99FF99", bg="#3c3c6c"}},
-        {current_time, color={fg="#99FFFF", bg="#3c3c6c"}},
-      }
     },
-    inactive_sections = {
-      lualine_a = {},
-      lualine_b = {},
-      lualine_c = {},
-      lualine_x = {},
-      lualine_y = {},
-      lualine_z = {}
+    lualine_b = {
+      {
+        'branch',
+        icon = '',
+        padding = { left = 0, right = 1 },
+        fmt = function(branch_name)
+          if not branch_name or branch_name == '' then
+            return '' -- Git管理外の場合は空文字列を返す
+          end
+
+          if win_width > 100 then
+            return ' ' .. branch_name -- アイコン＋テキスト
+          else
+            return '' -- アイコンのみ
+          end
+        end,
+      },
+      {
+        'diff',
+        symbols = { added = ' ', modified = ' ', removed = ' ' },
+        -- symbols = { added = '➕ ', modified = '✏️ ', removed = '❌ ' }
+        padding = { left = 0, right = 1 },
+        fmt = function(str)
+          if win_width > 90 then
+            return str
+          else
+            return str:gsub('%d+', '') -- 数字を削除してアイコンのみを返す
+          end
+        end,
+      },
     },
-    tabline = {},
-    winbar = {},
-    inactive_winbar = {},
-    extensions = {}
+    lualine_c = {
+      {
+        'filename',
+        path = 0, -- 1:ファイルパスを表示、0:非表示
+        -- symbols = { modified = '● ', readonly = '[RO]' },
+        symbols = { modified = '●', readonly = '' },
+        -- symbols = { modified = ' ', readonly = ' ' },
+        -- symbols = { modified = '[+]', readonly = '[-]' },
+      },
+      {
+        'diagnostics',
+        update_in_insert = false, -- 挿入モードでは更新しない
+        padding = { left = 0, right = 1 },
+        symbols = { error = ' ', warn = ' ', info = ' ', hint = ' ' },
+        diagnostics_color = {
+          error = { fg = colors.red },
+          warn = { fg = colors.yellow },
+          info = { fg = colors.green },
+          hint = { fg = colors.cyan },
+        },
+        fmt = function(str)
+          if win_width > 80 then
+            return str
+          else
+            return str:gsub('%d+', '') -- 数字を削除してアイコンのみを返す
+          end
+        end,
+      },
+    },
+    lualine_x = {
+      {
+        'filetype',
+        icon_only = win_width <= 90,
+      },
+      {
+        'fileformat',
+        symbols = { unix = '', dos = '', mac = '' }, --  , ,
+        color = fileformat_color,
+        padding = { left = 0, right = 1 },
+      },
+      {
+        'encoding',
+        padding = { left = 0, right = 1 },
+        cond = function()
+          return win_width > 70
+        end,
+      },
+    },
+    lualine_y = {
+      {
+        'progress',
+        cond = function()
+          return win_width > 80
+        end,
+      },
+    },
+    lualine_z = {
+      {
+        'location',
+        padding = 1,
+        cond = function()
+          return win_width > 70
+        end,
+      },
+    },
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = { 'filename' },
+    lualine_x = { 'location' },
+    lualine_y = {},
+    lualine_z = {},
+  },
+  tabline = {},
+  winbar = {},
+  inactive_winbar = {},
+  extensions = {},
 }

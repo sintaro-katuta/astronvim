@@ -22,17 +22,17 @@ return {
     opts = function(_, opts)
       -- customize the dashboard header
       opts.section.header.val = {
-	[[                                                                       ]],
-	[[  ██████   █████                   █████   █████  ███                  ]],
-	[[ ░░██████ ░░███                   ░░███   ░░███  ░░░                   ]],
-	[[  ░███░███ ░███   ██████   ██████  ░███    ░███  ████  █████████████   ]],
-	[[  ░███░░███░███  ███░░███ ███░░███ ░███    ░███ ░░███ ░░███░░███░░███  ]],
-	[[  ░███ ░░██████ ░███████ ░███ ░███ ░░███   ███   ░███  ░███ ░███ ░███  ]],
-	[[  ░███  ░░█████ ░███░░░  ░███ ░███  ░░░█████░    ░███  ░███ ░███ ░███  ]],
-	[[  █████  ░░█████░░██████ ░░██████     ░░███      █████ █████░███ █████ ]],
-	[[ ░░░░░    ░░░░░  ░░░░░░   ░░░░░░       ░░░      ░░░░░ ░░░░░ ░░░ ░░░░░  ]],
-	[[                                                                       ]],
-}
+	      [[                                                                       ]],
+	      [[  ██████   █████                   █████   █████  ███                  ]],
+	      [[ ░░██████ ░░███                   ░░███   ░░███  ░░░                   ]],
+	      [[  ░███░███ ░███   ██████   ██████  ░███    ░███  ████  █████████████   ]],
+	      [[  ░███░░███░███  ███░░███ ███░░███ ░███    ░███ ░░███ ░░███░░███░░███  ]],
+	      [[  ░███ ░░██████ ░███████ ░███ ░███ ░░███   ███   ░███  ░███ ░███ ░███  ]],
+	      [[  ░███  ░░█████ ░███░░░  ░███ ░███  ░░░█████░    ░███  ░███ ░███ ░███  ]],
+	      [[  █████  ░░█████░░██████ ░░██████     ░░███      █████ █████░███ █████ ]],
+	      [[ ░░░░░    ░░░░░  ░░░░░░   ░░░░░░       ░░░      ░░░░░ ░░░░░ ░░░ ░░░░░  ]],
+	      [[                                                                       ]],
+      }
       return opts
     end,
   },
@@ -107,7 +107,6 @@ return {
       { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
-
   {
     "Exafunction/codeium.nvim",
     dependencies = {
@@ -121,7 +120,7 @@ return {
   },
   {
     'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' }
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
   {
     "folke/tokyonight.nvim",
@@ -129,9 +128,8 @@ return {
     priority = 1000,
     opts = {},
   },
-    {
+  {
     'lmantw/themify.nvim',
-      
     lazy = false,
     priority = 999,
 
@@ -141,20 +139,20 @@ return {
     "kdheepak/lazygit.nvim",
     lazy = true,
     cmd = {
-        "LazyGit",
-        "LazyGitConfig",
-        "LazyGitCurrentFile",
-        "LazyGitFilter",
-        "LazyGitFilterCurrentFile",
+      "LazyGit",
+      "LazyGitConfig",
+      "LazyGitCurrentFile",
+      "LazyGitFilter",
+      "LazyGitFilterCurrentFile",
     },
     -- optional for floating window border decoration
     dependencies = {
-        "nvim-lua/plenary.nvim",
+      "nvim-lua/plenary.nvim",
     },
     -- setting the keybinding for LazyGit with 'keys' is recommended in
     -- order to load the plugin when the command is run for the first time
     keys = {
-        { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
-  }
-}
+      { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+    }
+  },
 }
